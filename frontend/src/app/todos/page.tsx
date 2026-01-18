@@ -80,47 +80,62 @@ export default function TodosPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
-        <nav className="bg-white shadow-sm">
+      <div className="min-h-screen bg-black">
+        <nav className="bg-dark-light border-b border-primary-900/30 shadow-lg shadow-primary-900/20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between h-16">
               <div className="flex items-center">
-                <h1 className="text-xl font-semibold text-gray-900">My Todos</h1>
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-primary-500 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/50">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                  </div>
+                  <h1 className="text-2xl font-bold gradient-text">
+                    My Todos
+                  </h1>
+                </div>
               </div>
               <div className="flex items-center">
                 <button
                   onClick={handleLogout}
-                  className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                  className="flex items-center space-x-2 text-gray-400 hover:text-red-400 px-4 py-2 rounded-lg hover:bg-red-950/30 transition-all duration-200 font-medium border border-transparent hover:border-red-500/30"
                 >
-                  Logout
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  <span>Logout</span>
                 </button>
               </div>
             </div>
           </div>
         </nav>
 
-        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-          <div className="px-4 py-6 sm:px-0">
-            {loading && (
-              <div className="text-center py-12">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-                <p className="mt-2 text-gray-600">Loading todos...</p>
-              </div>
-            )}
+        <main className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+          {loading && (
+            <div className="text-center py-20">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent"></div>
+              <p className="mt-4 text-gray-400 font-medium">Loading your todos...</p>
+            </div>
+          )}
 
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-                {error}
+          {error && (
+            <div className="card p-6 bg-red-950/50 border-2 border-red-500 animate-fade-in">
+              <div className="flex items-center space-x-3">
+                <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-red-300 font-medium">{error}</p>
               </div>
-            )}
+            </div>
+          )}
 
-            {!loading && !error && (
-              <>
-                <AddTodoForm onAdd={handleAddTodo} />
-                <TodoList todos={todos} onToggle={handleToggleTodo} onDelete={handleDeleteTodo} />
-              </>
-            )}
-          </div>
+          {!loading && !error && (
+            <div className="space-y-6">
+              <AddTodoForm onAdd={handleAddTodo} />
+              <TodoList todos={todos} onToggle={handleToggleTodo} onDelete={handleDeleteTodo} />
+            </div>
+          )}
         </main>
       </div>
     </ProtectedRoute>

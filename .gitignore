@@ -59,3 +59,9 @@ htmlcov/
 
 # Alembic
 alembic/versions/*.pyc
+
+# Tokens and sensitive data
+token.txt
+token_response.json
+cookies.txt
+cookies_after_logout.txt
