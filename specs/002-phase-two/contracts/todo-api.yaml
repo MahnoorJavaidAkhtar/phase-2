@@ -1,0 +1,493 @@
+openapi: 3.0.3
+info:
+  title: Todo API - Todo Management
+  description: CRUD operations for managing user todos
+  version: 1.0.0
+  contact:
+    name: Evolution of Todo - Phase II
+
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+  - url: https://api.yourdomain.com
+    description: Production server
+
+tags:
+  - name: Todos
+    description: Todo CRUD operations
+
+security:
+  - bearerAuth: []
+  - cookieAuth: []
+
+paths:
+  /api/todos:
+    get:
+      tags:
+        - Todos
+      summary: Get all todos for authenticated user
+      description: Returns a list of all todos belonging to the authenticated user
+      operationId: getTodos
+      parameters:
+        - name: is_complete
+          in: query
+          description: Filter by completion status
+          required: false
+          schema:
+            type: boolean
+            example: false
+        - name: limit
+          in: query
+          description: Maximum number of todos to return
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+            example: 20
+        - name: offset
+          in: query
+          description: Number of todos to skip (for pagination)
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+            example: 0
+      responses:
+        '200':
+          description: List of todos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo'
+        '401':
+          description: Unauthorized (not authenticated)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      tags:
+        - Todos
+      summary: Create a new todo
+      description: Creates a new todo for the authenticated user
+      operationId: createTodo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TodoCreate'
+      responses:
+        '201':
+          description: Todo created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '400':
+          description: Bad request (invalid input)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                detail: Title cannot be empty
+        '401':
+          description: Unauthorized (not authenticated)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  /api/todos/{todo_id}:
+    get:
+      tags:
+        - Todos
+      summary: Get a specific todo
+      description: Returns a single todo by ID (must belong to authenticated user)
+      operationId: getTodo
+      parameters:
+        - name: todo_id
+          in: path
+          description: Todo ID
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Todo details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '401':
+          description: Unauthorized (not authenticated)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden (todo belongs to another user)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                detail: Access denied
+        '404':
+          description: Todo not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                detail: Todo not found
+
+    put:
+      tags:
+        - Todos
+      summary: Update a todo
+      description: Updates an existing todo (must belong to authenticated user)
+      operationId: updateTodo
+      parameters:
+        - name: todo_id
+          in: path
+          description: Todo ID
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TodoUpdate'
+      responses:
+        '200':
+          description: Todo updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '400':
+          description: Bad request (invalid input)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized (not authenticated)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden (todo belongs to another user)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Todo not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+    patch:
+      tags:
+        - Todos
+      summary: Partially update a todo
+      description: Updates specific fields of a todo (must belong to authenticated user)
+      operationId: patchTodo
+      parameters:
+        - name: todo_id
+          in: path
+          description: Todo ID
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TodoPatch'
+      responses:
+        '200':
+          description: Todo updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '400':
+          description: Bad request (invalid input)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized (not authenticated)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden (todo belongs to another user)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Todo not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags:
+        - Todos
+      summary: Delete a todo
+      description: Deletes a todo (must belong to authenticated user)
+      operationId: deleteTodo
+      parameters:
+        - name: todo_id
+          in: path
+          description: Todo ID
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '204':
+          description: Todo deleted successfully (no content)
+        '401':
+          description: Unauthorized (not authenticated)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden (todo belongs to another user)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Todo not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/todos/{todo_id}/toggle:
+    post:
+      tags:
+        - Todos
+      summary: Toggle todo completion status
+      description: Toggles the is_complete status of a todo (must belong to authenticated user)
+      operationId: toggleTodo
+      parameters:
+        - name: todo_id
+          in: path
+          description: Todo ID
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Todo status toggled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Todo'
+        '401':
+          description: Unauthorized (not authenticated)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden (todo belongs to another user)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Todo not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token in Authorization header
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: auth_token
+      description: JWT token in HTTP-only cookie
+
+  schemas:
+    Todo:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique todo identifier
+          example: 1
+        user_id:
+          type: integer
+          description: ID of the user who owns this todo
+          example: 1
+        title:
+          type: string
+          maxLength: 500
+          description: Todo title
+          example: Buy groceries
+        description:
+          type: string
+          nullable: true
+          description: Optional detailed description
+          example: Milk, eggs, bread, and vegetables
+        is_complete:
+          type: boolean
+          description: Completion status
+          example: false
+        created_at:
+          type: string
+          format: date-time
+          description: Todo creation timestamp
+          example: '2026-01-18T10:30:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          description: Last modification timestamp
+          example: '2026-01-18T10:30:00Z'
+      required:
+        - id
+        - user_id
+        - title
+        - is_complete
+        - created_at
+        - updated_at
+
+    TodoCreate:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 500
+          minLength: 1
+          description: Todo title (required)
+          example: Buy groceries
+        description:
+          type: string
+          nullable: true
+          description: Optional detailed description
+          example: Milk, eggs, bread, and vegetables
+      required:
+        - title
+
+    TodoUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 500
+          minLength: 1
+          description: Todo title
+          example: Buy groceries and cook dinner
+        description:
+          type: string
+          nullable: true
+          description: Detailed description
+          example: Updated shopping list with dinner ingredients
+        is_complete:
+          type: boolean
+          description: Completion status
+          example: true
+      required:
+        - title
+
+    TodoPatch:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 500
+          minLength: 1
+          description: Todo title
+          example: Buy groceries and cook dinner
+        description:
+          type: string
+          nullable: true
+          description: Detailed description
+          example: Updated shopping list
+        is_complete:
+          type: boolean
+          description: Completion status
+          example: true
+      description: All fields are optional for PATCH requests
+
+    Error:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Error message
+          example: An error occurred
+      required:
+        - detail
+
+    ValidationError:
+      type: object
+      properties:
+        detail:
+          type: array
+          items:
+            type: object
+            properties:
+              loc:
+                type: array
+                items:
+                  type: string
+                description: Location of the error
+              msg:
+                type: string
+                description: Error message
+              type:
+                type: string
+                description: Error type
+          example:
+            - loc: ['body', 'title']
+              msg: 'field required'
+              type: 'value_error.missing'

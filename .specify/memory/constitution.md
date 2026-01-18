@@ -1,13 +1,17 @@
 <!--
 Sync Impact Report:
-- Version: NEW → 1.0.0 (Initial constitution for Evolution of Todo project)
-- Modified Principles: N/A (initial creation)
-- Added Sections: All sections (initial creation)
+- Version: 1.0.0 → 1.1.0 (Phase II technology matrix amendment)
+- Modified Principles:
+  - Section III (Phase Governance): Clarified phase boundaries and technology allowances
+  - Section IV (Technology Stack Constraints): Restructured to phase-specific technology matrix
+- Added Sections:
+  - Phase-specific technology matrices (Phase I, Phase II, Phase III+)
+  - Technology allowance rules by phase
 - Removed Sections: None
 - Templates Status:
-  ✅ spec-template.md - Reviewed, aligns with SDD mandate
-  ✅ plan-template.md - Reviewed, aligns with constitution check requirement
-  ✅ tasks-template.md - Reviewed, aligns with phase-based execution
+  ✅ spec-template.md - No changes required (technology-agnostic)
+  ✅ plan-template.md - No changes required (references constitution check)
+  ✅ tasks-template.md - No changes required (phase-agnostic structure)
 - Follow-up TODOs: None
 -->
 
@@ -67,57 +71,143 @@ Agents are autonomous executors of approved specifications. Humans provide requi
 
 **Each phase is strictly scoped by its specification. Future-phase features MUST NOT leak into earlier phases.**
 
-The Evolution of Todo project spans five phases (Phase I through Phase V). Each phase:
+The Evolution of Todo project spans multiple phases, each with distinct architectural characteristics and technology allowances. Each phase:
 - Has its own specification defining scope and deliverables
 - Builds incrementally on previous phases
 - MUST NOT include features designated for future phases
 - May only evolve architecture through updated specs and plans
 
 **Phase Boundaries**:
-- **Phase I**: Core todo functionality (CLI-based, local storage)
-- **Phase II**: Web interface and basic API
-- **Phase III**: Multi-user support and authentication
-- **Phase IV**: Real-time collaboration and notifications
-- **Phase V**: Advanced features (AI, integrations, analytics)
+- **Phase I**: In-memory console application only
+  - Core todo functionality (CLI-based)
+  - Local in-memory storage (no persistence)
+  - No web interface, no authentication, no database
+
+- **Phase II**: Full-stack web application
+  - Backend REST API
+  - Database persistence (Neon PostgreSQL)
+  - Web frontend (Next.js)
+  - User authentication (Better Auth)
+  - Multi-user support
+
+- **Phase III and Beyond**: Advanced cloud infrastructure
+  - Cloud-native deployment
+  - AI and agent frameworks
+  - Advanced orchestration
+  - Real-time collaboration
+  - Analytics and integrations
+
+**Technology Allowances by Phase**:
+- **Phase I**: Python console application only
+- **Phase II**: Web frontend, REST API, PostgreSQL database, authentication allowed
+- **Phase III+**: AI frameworks, agent frameworks, cloud infrastructure, orchestration allowed
 
 **Enforcement Rules**:
 - Agents MUST verify current phase before implementing any feature
 - Any feature request MUST be validated against current phase scope
+- Technology choices MUST comply with phase-specific allowances (see Section IV)
 - Cross-phase dependencies MUST be explicitly documented in specifications
 - Architecture evolution MUST be documented via ADRs and reflected in updated specs
 
-**Rationale**: Strict phase governance prevents premature optimization, maintains focus on current deliverables, and ensures each phase delivers a complete, testable increment.
+**Rationale**: Strict phase governance prevents premature optimization, maintains focus on current deliverables, ensures each phase delivers a complete testable increment, and enforces technology discipline to avoid scope creep.
 
 ### IV. Technology Stack Constraints
 
-**Technology choices are fixed to ensure consistency and maintainability.**
+**Technology choices are phase-specific and fixed to ensure consistency, maintainability, and phase isolation.**
+
+This section serves as the **authoritative technology policy** for the Evolution of Todo project. All technology decisions MUST comply with the phase-specific matrices below.
+
+#### Phase I Technology Matrix
+
+**Architecture**: In-memory console application only
+
+**Allowed Technologies**:
+- **Language**: Python 3.11+
+- **Storage**: In-memory data structures only (lists, dictionaries)
+- **Interface**: Command-line interface (CLI) only
+- **Testing**: pytest (optional, if tests requested)
+
+**Prohibited in Phase I**:
+- ❌ Web frameworks (FastAPI, Flask, Django, etc.)
+- ❌ Databases (PostgreSQL, SQLite, MongoDB, etc.)
+- ❌ ORMs (SQLModel, SQLAlchemy, etc.)
+- ❌ Authentication libraries
+- ❌ Frontend frameworks
+- ❌ HTTP clients/servers
+- ❌ File persistence (JSON, CSV, pickle, etc.)
+- ❌ AI or agent frameworks
+
+**Rationale**: Phase I focuses on core business logic without infrastructure complexity. In-memory storage ensures simplicity and rapid iteration.
+
+#### Phase II Technology Matrix
+
+**Architecture**: Full-stack web application with REST API and database persistence
 
 **Backend Stack**:
 - **Language**: Python 3.11+
-- **API Framework**: FastAPI
-- **ORM**: SQLModel
-- **Database**: Neon DB (PostgreSQL-compatible)
-- **Agent Framework**: OpenAI Agents SDK
-- **Tool Protocol**: Model Context Protocol (MCP)
+- **API Framework**: FastAPI (or Python REST framework)
+- **Database**: Neon Serverless PostgreSQL
+- **ORM/Data Layer**: SQLModel or equivalent Python ORM
+- **Authentication**: Better Auth (or equivalent Python auth library)
+- **Testing**: pytest (optional, if tests requested)
 
-**Frontend Stack** (Phase II+):
+**Frontend Stack**:
 - **Framework**: Next.js (React)
 - **Language**: TypeScript
-- **Styling**: TailwindCSS (or as specified in phase specs)
+- **Styling**: TailwindCSS or as specified in phase specs
+- **Authentication Client**: Better Auth client integration
+- **Testing**: Jest, React Testing Library (optional, if tests requested)
 
-**Infrastructure Stack** (Phase IV+):
+**Allowed in Phase II**:
+- ✅ REST API endpoints
+- ✅ Database persistence (Neon PostgreSQL)
+- ✅ User authentication and authorization
+- ✅ Web frontend (Next.js/React)
+- ✅ HTTP clients and servers
+- ✅ Session management
+- ✅ Multi-user support
+
+**Prohibited in Phase II**:
+- ❌ AI frameworks (OpenAI SDK, LangChain, etc.)
+- ❌ Agent frameworks (OpenAI Agents SDK, AutoGPT, etc.)
+- ❌ Container orchestration (Kubernetes, Docker Swarm)
+- ❌ Message queues (Kafka, RabbitMQ)
+- ❌ Service mesh (Dapr, Istio)
+- ❌ Advanced cloud infrastructure
+
+**Rationale**: Phase II introduces web capabilities and persistence while maintaining architectural simplicity. Better Auth provides modern authentication without complexity. Neon PostgreSQL offers serverless database without infrastructure overhead.
+
+#### Phase III+ Technology Matrix
+
+**Architecture**: Cloud-native, distributed systems with advanced capabilities
+
+**Additional Allowed Technologies** (beyond Phase II):
+- **AI/ML Frameworks**: OpenAI SDK, LangChain, custom ML models
+- **Agent Frameworks**: OpenAI Agents SDK, custom agent implementations
 - **Containerization**: Docker
 - **Orchestration**: Kubernetes
-- **Messaging**: Kafka
-- **Service Mesh**: Dapr
+- **Messaging**: Kafka, RabbitMQ
+- **Service Mesh**: Dapr, Istio
+- **Observability**: Prometheus, Grafana, OpenTelemetry
+- **Cloud Platforms**: AWS, Azure, GCP services
 
-**Rationale**: Fixed technology choices reduce decision fatigue, ensure team expertise alignment, and maintain architectural consistency across phases.
+**Rationale**: Phase III+ enables advanced features requiring distributed systems, AI capabilities, and cloud-native infrastructure.
 
-**Exceptions**: Technology substitutions require:
-1. Documented justification in an ADR
-2. User approval
-3. Updated constitution and phase specifications
-4. Migration plan for existing code
+#### Technology Exception Process
+
+**Technology substitutions or additions require**:
+1. Documented justification in an ADR (Architecture Decision Record)
+2. Explicit user approval
+3. Updated constitution with version bump
+4. Updated phase specifications
+5. Migration plan for existing code (if applicable)
+
+**Exception Examples**:
+- Substituting SQLAlchemy for SQLModel → Requires ADR + approval
+- Adding Redis for caching in Phase II → Requires ADR + approval + constitution amendment
+- Using Django instead of FastAPI → Requires ADR + approval + constitution amendment
+
+**Rationale**: Fixed technology choices reduce decision fatigue, ensure team expertise alignment, maintain architectural consistency, and enforce phase discipline. Exceptions are allowed but must be deliberate and documented.
 
 ### V. Quality & Architecture Standards
 
@@ -288,4 +378,4 @@ Any violation of constitutional principles MUST be justified:
 
 ---
 
-**Version**: 1.0.0 | **Ratified**: 2026-01-13 | **Last Amended**: 2026-01-13
+**Version**: 1.1.0 | **Ratified**: 2026-01-13 | **Last Amended**: 2026-01-18
