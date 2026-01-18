@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .database import settings
 from .api.auth import router as auth_router
+from .api.todos import router as todos_router
 
 # Create FastAPI app instance
 app = FastAPI(
@@ -23,6 +24,7 @@ app.add_middleware(
 
 # Register routers
 app.include_router(auth_router)
+app.include_router(todos_router)
 
 
 @app.get("/")
@@ -35,3 +37,4 @@ async def root():
 async def health_check():
     """Health check endpoint."""
     return {"status": "healthy"}
+

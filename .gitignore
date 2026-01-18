@@ -1,3 +1,4 @@
+
 # Python
 __pycache__/
 *.pyc
@@ -17,6 +18,19 @@ ENV/
 # Environment variables
 .env
 .env.*
+!.env.example
+!.env.local.example
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Next.js
+.next/
+out/
+.vercel
 
 # IDE
 .vscode/
@@ -37,3 +51,11 @@ htmlcov/
 
 # Logs
 *.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Alembic
+alembic/versions/*.pyc
