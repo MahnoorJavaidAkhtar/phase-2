@@ -25,20 +25,14 @@ settings = Settings()
 # Convert postgresql:// to postgresql+psycopg:// for psycopg3 support
 database_url = settings.database_url.replace("postgresql://", "postgresql+psycopg://")
 
-# Create SQLModel engine with serverless-friendly settings
-# Use minimal pooling for serverless environments
-is_serverless = settings.environment == "production"
+# Create SQLModel engine with connection pooling
 engine = create_engine(
     database_url,
     echo=settings.environment == "development",  # Log SQL queries in dev
-    pool_size=1 if is_serverless else 5,  # Minimal pool for serverless
-    max_overflow=0 if is_serverless else 10,  # No overflow for serverless
+    pool_size=5,
+    max_overflow=10,
     pool_pre_ping=True,  # Verify connections before using
-    pool_recycle=300 if is_serverless else 3600,  # Shorter recycle for serverless
-    connect_args={
-        "connect_timeout": 10,  # 10 second timeout
-        "options": "-c statement_timeout=30000"  # 30 second query timeout
-    }
+    pool_recycle=3600,  # Recycle connections after 1 hour
 )
 
 
